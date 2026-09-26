@@ -6,21 +6,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: kivy/buildozer:latest
     steps:
     - uses: actions/checkout@v4
-    - name: Build APK
-      run: echo y | buildozer -v android debug
-    - name: Prepare APK
-      run: |
-        mkdir -p release
-        cp bin/*.apk release/RP.apk
+    - name: Build with Buildozer
+      uses: ArtemSBulgakov/buildozer-action@v1
+      id: buildozer
+      with:
+        command: yes | buildozer -v android debug
+        buildozer_version: stable
     - name: Upload Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v0.1.${{ github.run_number }}
         name: RP v0.1.${{ github.run_number }}
-        files: release/RP.apk
+        files: ${{ steps.buildozer.outputs.filename }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
