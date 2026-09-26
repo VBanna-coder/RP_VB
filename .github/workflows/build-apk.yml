@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build APK
-      run: buildozer -v android debug
+      run: echo y | buildozer -v android debug
     - name: Prepare APK
       run: |
         mkdir -p release
