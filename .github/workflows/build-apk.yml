@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    env:
+      APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
@@ -19,8 +21,16 @@ jobs:
       run: |
         pip install --upgrade pip
         pip install buildozer cython==0.29.36
+    - name: Pre-accept Android SDK licenses
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        mkdir -p ~/.buildozer/android/platform
+        echo "y" > /tmp/yes.txt
+        for i in $(seq 1 200); do echo "y"; done > /tmp/yes_many.txt
     - name: Build APK
-      run: yes | buildozer -v android debug
+      run: |
+        yes | buildozer -v android debug < /tmp/yes_many.txt || buildozer -v android debug < /tmp/yes_many.txt
     - name: Upload Release
       uses: softprops/action-gh-release@v2
       with:
