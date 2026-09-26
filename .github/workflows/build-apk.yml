@@ -11,11 +11,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build APK
+      run: buildozer -v android debug
+    - name: Prepare APK
       run: |
-        yes | buildozer -v android debug || true
-        ls -la bin/ || true
-    - uses: actions/upload-artifact@v4
+        mkdir -p release
+        cp bin/*.apk release/RP.apk
+    - name: Upload Release
+      uses: softprops/action-gh-release@v2
       with:
-        name: package
-        path: bin/*.apk
-        if-no-files-found: warn
+        tag_name: v0.1.${{ github.run_number }}
+        name: RP v0.1.${{ github.run_number }}
+        files: release/RP.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
